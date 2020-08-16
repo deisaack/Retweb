@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.collections.MutableMap as MutableMap
 
 
 internal class MainActivity : AppCompatActivity() {
@@ -65,6 +66,26 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getPosts() {
+        lifecycleScope.launch {
+            val params: MutableMap<String?, String?> = HashMap()
+            params["_sort"] = "userId"
+            val call = mainRepository.getPosts(params)
+            call?.enqueue(object : Callback<List<Post?>?> {
+                override fun onFailure(call: Call<List<Post?>?>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onResponse(call: Call<List<Post?>?>, response: Response<List<Post?>?>) {
+                    if (response.isSuccessful) {
+                        val data = response.body()
+                        resultTextView.append("List returned status : " + response.code().toString())
+                    }
+                }
+            })
+        }
+    }
+
     private fun setupObservers() {
         viewModel.getUsers().observe(this, Observer {
             it?.let { resource ->
@@ -88,13 +109,23 @@ internal class MainActivity : AppCompatActivity() {
 
     private fun createPost() {
         lifecycleScope.launch {
-            val post = Post(23, "20", "Hi Title", text = "Hello world")
-            val fields: MutableMap<String, String> = HashMap()
-            fields["userId"] = "25"
-            fields["title"] = "New Title"
-            val call: Call<Post> = mainRepository.createPost(post)
-            call.enqueue(object : Callback<Post> {
-                override fun onResponse(call: Call<Post>, response: Response<Post?>) {
+//            Option 1: Create a Post instance and submit it
+//            val post = Post(23, "20", "Hi Title", text = "Hello world")
+//            val call: Call<Post> = mainRepository.createPost(post)
+
+//            Option 2: create a field map of the available fields and submit
+//            val fields: MutableMap<String, String> = HashMap()
+//            fields["userId"] = "29"
+//            fields["title"] = "Title is this"
+//            fields["body"] = "Happy new year"
+//            val f = fields as Map<String?, String?>
+//            val call: Call<Post?> = mainRepository.createPost(f)
+
+//           Option 3: pass the required fields as parameters in the function
+            val call: Call<Post?> = mainRepository.createPost(
+                userId = 12, title = "Hey there title", text = "Fantastic text")
+            call.enqueue(object : Callback<Post?> {
+                override fun onResponse(call: Call<Post?>, response: Response<Post?>) {
                     if (!response.isSuccessful()) {
                         resultTextView.append("\n\nPost Code: " + response.code())
                         return
@@ -103,6 +134,7 @@ internal class MainActivity : AppCompatActivity() {
                     var content = ""
                     content +=  "\n\n\nhhhhh" + resp.toString()
                     resultTextView.append(content)
+                    getPosts()
                 }
 
                 override fun onFailure(call: Call<Post?>?, t: Throwable) {

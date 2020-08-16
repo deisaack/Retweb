@@ -9,6 +9,9 @@ class MainRepository() {
 
     suspend fun getUsers() = mockApi.getUsers()
     suspend fun getPost(postId: Int) = jsonPlaceholderApi.getPost(postId)
+    suspend fun createPost(fields: Map<String?, String?>) = jsonPlaceholderApi.createPost(fields)
     suspend fun createPost(post: Post) = jsonPlaceholderApi.createPost(post)
+    suspend fun createPost(userId: Int, title: String, text: String) = jsonPlaceholderApi.createPost(userId, title, text)
     suspend fun getPosts() = jsonPlaceholderApi.getPosts()
+    suspend fun getPosts(parameters: Map<String?, String?>) = jsonPlaceholderApi.getPosts(parameters)
 }
