@@ -1,147 +1,76 @@
 package co.ke.deisaac.retweb.ui.main
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import co.ke.deisaac.retweb.ExampleAdapter
+import co.ke.deisaac.retweb.ExampleItem
 import co.ke.deisaac.retweb.R
-import co.ke.deisaac.retweb.data.model.Post
-import co.ke.deisaac.retweb.data.repository.MainRepository
-import co.ke.deisaac.retweb.data.utils.Status
-import co.ke.deisaac.retweb.ui.base.ViewModelFactory
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.collections.MutableMap as MutableMap
 
 
-internal class MainActivity : AppCompatActivity() {
-    private val mainRepository = MainRepository()
-    lateinit var resultTextView: TextView;
-    private lateinit var viewModel: MainViewModel
-
-    companion object {
-        private const val TAG = "MainActivity"
-    }
+class MainActivity : AppCompatActivity() {
+    private var mExampleList: ArrayList<ExampleItem>? = null
+    private var mRecyclerView: RecyclerView? = null
+    private var mAdapter: RecyclerView.Adapter<*>? = null
+    private var mLayoutManager: RecyclerView.LayoutManager? = null
+    private var buttonInsert: Button? = null
+    private var buttonRemove: Button? = null
+    private var editTextInsert: EditText? = null
+    private var editTextRemove: EditText? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        resultTextView = findViewById(R.id.tv_result)
-        setUpViewModel()
-        setupObservers()
-        getPost()
-    }
-
-    fun setUpViewModel() {
-        viewModel = ViewModelProviders.of(this, ViewModelFactory())
-            .get(MainViewModel::class.java)
-    }
-
-    private fun getPost() {
-        lifecycleScope.launch {
-            val call = mainRepository.getPost(1)
-            call.enqueue(object : Callback<Post?> {
-                override fun onResponse(call: Call<Post?>, response: Response<Post?>) {
-                    if (!response.isSuccessful()) {
-                        resultTextView.append( "\n\nGetPost\nCode: " + response.code())
-                        return
-                    }
-                    val post: Post? = response.body()
-                    val content = "Post id: " + post?.id + "\nUserId: " +
-                            post?.userId + "\nTitle: " + post?.title + "\nText: " + post?.text
-                    resultTextView.append(content)
-                    createPost()
-                }
-
-                override fun onFailure(call: Call<Post?>, t: Throwable) {
-                    resultTextView.text = t.message
-                }
-            })
-        }
-    }
-
-    private fun getPosts() {
-        lifecycleScope.launch {
-            val params: MutableMap<String?, String?> = HashMap()
-            params["_sort"] = "userId"
-            val call = mainRepository.getPosts(params)
-            call?.enqueue(object : Callback<List<Post?>?> {
-                override fun onFailure(call: Call<List<Post?>?>, t: Throwable) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onResponse(call: Call<List<Post?>?>, response: Response<List<Post?>?>) {
-                    if (response.isSuccessful) {
-                        val data = response.body()
-                        resultTextView.append("List returned status : " + response.code().toString())
-                    }
-                }
-            })
-        }
-    }
-
-    private fun setupObservers() {
-        viewModel.getUsers().observe(this, Observer {
-            it?.let { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        val users = resource.data
-                        resultTextView.append("Users " + users?.count().toString())
-                        Log.d(TAG, resource.toString())
-                    }
-                    Status.ERROR -> {
-                        Log.d(TAG, it.message.toString())
-                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-                    }
-                    Status.LOADING -> {
-                        Log.d(TAG, "Loading")
-                    }
-                }
+        createExampleList()
+        buildRecyclerView()
+        buttonInsert = findViewById(R.id.button_insert)
+        buttonRemove = findViewById(R.id.button_remove)
+        editTextInsert = findViewById(R.id.edittext_insert)
+        editTextRemove = findViewById(R.id.edittext_remove)
+        buttonInsert?.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val position = editTextInsert?.getText().toString().toInt()
+                insertItem(position)
+            }
+        })
+        buttonRemove?.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val position = editTextRemove?.getText().toString().toInt()
+                removeItem(position)
             }
         })
     }
 
-    private fun createPost() {
-        lifecycleScope.launch {
-//            Option 1: Create a Post instance and submit it
-//            val post = Post(23, "20", "Hi Title", text = "Hello world")
-//            val call: Call<Post> = mainRepository.createPost(post)
+    fun insertItem(position: Int) {
+        mExampleList!!.add(
+            position,
+            ExampleItem(R.drawable.ic_baseline_monochrome_photos_24, "New Item At Position$position", "This is Line 2")
+        )
+        mAdapter!!.notifyItemInserted(position)
+    }
 
-//            Option 2: create a field map of the available fields and submit
-//            val fields: MutableMap<String, String> = HashMap()
-//            fields["userId"] = "29"
-//            fields["title"] = "Title is this"
-//            fields["body"] = "Happy new year"
-//            val f = fields as Map<String?, String?>
-//            val call: Call<Post?> = mainRepository.createPost(f)
+    fun removeItem(position: Int) {
+        mExampleList?.removeAt(position)
+        mAdapter?.notifyItemRemoved(position)
+    }
 
-//           Option 3: pass the required fields as parameters in the function
-            val call: Call<Post?> = mainRepository.createPost(
-                userId = 12, title = "Hey there title", text = "Fantastic text")
-            call.enqueue(object : Callback<Post?> {
-                override fun onResponse(call: Call<Post?>, response: Response<Post?>) {
-                    if (!response.isSuccessful()) {
-                        resultTextView.append("\n\nPost Code: " + response.code())
-                        return
-                    }
-                    val resp = response.body()
-                    var content = ""
-                    content +=  "\n\n\nhhhhh" + resp.toString()
-                    resultTextView.append(content)
-                    getPosts()
-                }
+    private fun createExampleList() {
+        mExampleList = ArrayList()
+        mExampleList!!.add(ExampleItem(R.drawable.ic_baseline_monochrome_photos_24, "Line 1", "Line 2"))
+        mExampleList!!.add(ExampleItem(R.drawable.ic_baseline_monochrome_photos_24, "Line 3", "Line 4"))
+        mExampleList!!.add(ExampleItem(R.drawable.ic_baseline_monochrome_photos_24, "Line 5", "Line 6"))
+    }
 
-                override fun onFailure(call: Call<Post?>?, t: Throwable) {
-                    resultTextView.append(t.message)
-                }
-            })
-        }
+    private fun buildRecyclerView() {
+        mRecyclerView = findViewById(R.id.recyclerView)
+        mRecyclerView?.setHasFixedSize(true)
+        mLayoutManager = LinearLayoutManager(this)
+        mAdapter = ExampleAdapter(mExampleList!!)
+        mRecyclerView?.setLayoutManager(mLayoutManager)
+        mRecyclerView?.setAdapter(mAdapter)
     }
 }
-
