@@ -7,26 +7,47 @@
     android:padding="8dp"
     tools:context=".ui.main.MainActivity">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/tv_result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <LinearLayout
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textColor="#000"/>
-    </androidx.core.widget.NestedScrollView>
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp">
 
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/recycler_view"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
+        <TextView android:id="@+id/lbl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Attach Printer"
+            android:padding="5dp"/>
+        <TextView android:id="@+id/lblPrinterName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Printer Name"/>
+        <EditText android:id="@+id/editTextContent"
+            android:layout_width="match_parent"
+            android:layout_margin="16dp"
+            android:padding="5dp"
+            android:layout_height="150dp" />
+        <Button android:id="@+id/btnConnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Connect Printer"/>
+        <Button android:id="@+id/btnDisconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Disconnect Printer"/>
+        <Button android:id="@+id/btnPrint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Print Document"/>
 
-<!--    </androidx.recyclerview.widget.RecyclerView>-->
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
