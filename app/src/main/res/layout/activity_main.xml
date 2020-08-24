@@ -20,34 +20,18 @@
         <TextView android:id="@+id/lbl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Attach Printer"
+            android:text="Attach"
             android:padding="5dp"/>
         <TextView android:id="@+id/lblPrinterName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="Printer Name"/>
-        <EditText android:id="@+id/editTextContent"
-            android:layout_width="match_parent"
-            android:layout_margin="16dp"
-            android:padding="5dp"
-            android:layout_height="150dp" />
-        <Button android:id="@+id/btnConnect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Connect Printer"/>
-        <Button android:id="@+id/btnDisconnect"
+            android:text="Namme"/>
+        <Button android:id="@+id/btnDoSomething"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:text="Disconnect Printer"/>
-        <Button android:id="@+id/btnPrint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Print Document"/>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,2 +1,2 @@
-include ':app', ':escposprinter'
+include ':app'
 rootProject.name = "RetWeb"
